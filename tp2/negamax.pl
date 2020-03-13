@@ -69,10 +69,9 @@ negamax(J,Situation,_,_, [_,Val]) :-
 %Cas numéro 3
 negamax(J, Situation, P, Pmax, [Coup, Val]) :-
 	successeurs(J, Situation, Situations_suivantes),
-	loop_negamax(J,P,Pmax,Situations_suivantes, BorisEnY),
-	meilleur(BorisEnY,[Coup,Temp]),
-
-	Val is (-Temp).
+	loop_negamax(J,P,Pmax,Situations_suivantes, Temp),
+	meilleur(Temp,[Coup,ValTemp]),
+	Val is (-ValTemp).
 
 	/*******************************************
 	 DEVELOPPEMENT D'UNE SITUATION NON TERMINALE

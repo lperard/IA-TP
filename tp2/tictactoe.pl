@@ -147,9 +147,9 @@ alignement_perdant([H|T], J) :- ground(H), H\=J, alignement_perdant(T,J).
 	lorsqu'un joueur J joue en coordonnees [L,C]
      */	
 
-successeur(_,Etat,[L,C]) :-
-    nth1(L, Etat, _),
-    nth1(C, Etat, X),
+successeur(J,Etat,[L,C]) :-
+    nth1(L, Etat, L2),
+    nth1(C, L2, X),
     var(X).
 
 	/**************************************
