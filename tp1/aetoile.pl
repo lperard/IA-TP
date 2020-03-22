@@ -54,13 +54,15 @@ affiche_solution([[F,H,G], U]):-
 	print(U).
 
 
-main:-
-	% initialisations Pf, Pu et Q 
+main_test:- 
 	initial_state(Ini),
+	% initialisations Pf, Pu et Q
+	empty(Q),
+	empty(Pf_vide),
+	empty(Pu_vide),
 	heuristique1(Ini, H1),
-	Pf = [[H1, H1, 0], Ini],
-	Pu = [Ini, [H1, H1, 0], nil, nil],
-	Q = [],
+	insert([[H1,H1,0], Ini], Pf_vide, Pf),
+	insert([Ini, [H1,H1,0], nil, nil], Pu_vide, Pu),
 	% lancement de Aetoile
 	aetoile(Pf,Pu,Q).
 
@@ -106,18 +108,40 @@ loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
 	).
 
 
+% La situation est connue dans Q
+node_process([U, [_,_,_], _,_], Q, Pu, Pf, Pu, Pf) :-
+	belongs([U, [_,_,_], _,_], Q).
+
+% La situation est connue dans Pu, on garde la meilleure
+node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
+	belongs([U,[Fu, Hu, Gu], PereU, Au], Pu),
+	F < Fu,
+	%On garde le meilleur: on enlève le moins bon et on insert le meilleur
+	suppress([U,[Fu, Hu, Gu], PereU, Au], Pu, Pu_inter),
+	suppress([[Fu, Hu, Gu], U], Pf, Pf_inter),
+	%
+	insert([U,[F, H, G],Pu_inter, Pu2),
+	insert([[F, H, G], U], Pf_inter, Pf2).
+% Dernier cas: c'est une situation nouvelle, on l'insert dans Pu et Pf
+node_process([U, [F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
+	insert([U, [F, H, G], Pere, A], Pu, Pu2),
+	insert([[F, H, G], U], Pf, Pf2).
+
+
+loop_successors2([Head|Tail], Q, Pu, Pf, Pu_final, Pf_final) :-
+	node_process(Head, Q, Pu, Pf, Pu_inter, Pf_inter),
+	loop_successors2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
+
 aetoile([],[], _):-
 	print("Pas de solution, l_etat final n_est pas atteignable").
 
 
 aetoile(Pf, Pu, Qs) :-
 	final_state(Final),
-	print(Pf),
 	suppress_min(Umin, Pf, Pf2_inutile), %a checker
 	print(Umin),
 	Umin = [[Fu, Hu, Gu], U],
 	(%If
-	print('Test'),
 	U = Final ->
 	%Then
 	affiche_solution(Umin)
