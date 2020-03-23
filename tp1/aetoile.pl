@@ -78,7 +78,7 @@ expand(U, G, R):-
 loop_successors([],_,_,_,_,_).
 
 
-loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
+/*loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
 	Head = [U, [F,H,G], Pere, A],
 	HPf = [[F,H,G], U],
 	(%If
@@ -105,12 +105,13 @@ loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
 		insert(HPf, Pf, Pf2),
 		loop_successors(Tail,Q, Pu2, Pf2, Pu3, Pf3)
 		)
-	).
+	).*/
 
 
 % La situation est connue dans Q
 node_process([U, [_,_,_], _,_], Q, Pu, Pf, Pu, Pf) :-
-	belongs([U, [_,_,_], _,_], Q).
+	belongs([U, [_,_,_], _,_], Q),
+	print('Cas 1').
 
 % La situation est connue dans Pu, on garde la meilleure
 node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
@@ -119,36 +120,40 @@ node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	%On garde le meilleur: on enlève le moins bon et on insert le meilleur
 	suppress([U,[Fu, Hu, Gu], PereU, Au], Pu, Pu_inter),
 	suppress([[Fu, Hu, Gu], U], Pf, Pf_inter),
-	%
-	insert([U,[F, H, G],Pu_inter, Pu2),
-	insert([[F, H, G], U], Pf_inter, Pf2).
+	insert([U,[F, H, G]],Pu_inter, Pu2),
+	insert([[F, H, G], U], Pf_inter, Pf2)
+	print('Cas 2').
 % Dernier cas: c'est une situation nouvelle, on l'insert dans Pu et Pf
 node_process([U, [F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	insert([U, [F, H, G], Pere, A], Pu, Pu2),
-	insert([[F, H, G], U], Pf, Pf2).
+	insert([[F, H, G], U], Pf, Pf2),
+	print('Cas 3').
 
 
-loop_successors2([Head|Tail], Q, Pu, Pf, Pu_final, Pf_final) :-
+loop_successors_2([Head|Tail], Q, Pu, Pf, Pu_final, Pf_final) :-
 	node_process(Head, Q, Pu, Pf, Pu_inter, Pf_inter),
-	loop_successors2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
+	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
 
 aetoile([],[], _):-
 	print("Pas de solution, l_etat final n_est pas atteignable").
 
-
+% Si la situation de coût minimal est la situation finale, on s'arrete
 aetoile(Pf, Pu, Qs) :-
 	final_state(Final),
 	suppress_min(Umin, Pf, Pf2_inutile), %a checker
-	print(Umin),
 	Umin = [[Fu, Hu, Gu], U],
-	(%If
-	U = Final ->
-	%Then
-	affiche_solution(Umin)
-	;
-	%Else
+	U = Final,
+	affiche_solution(Umin).
+
+% Sinon on continue d'explorer
+aetoile(Pf, Pu, Qs) :-
+	final_state(Final),
+	suppress_min(Umin, Pf, Pf2_inutile), %a checker
+	Umin = [[Fu, Hu, Gu], U],
 	suppress([[F,H,G],U],Pf,Pf2),
 	suppress([U, [Fu2, Hu2, Gu2], Upere, Au], Pu, Pu2),
 	expand(U,G,R),
-	loop_successors(R, Q, Pu2, Pf2, Pf3, Ps3),
-	aetoile(Pf3, Pu3, Ps3)).
+	loop_successors_2(R, Q, Pu2, Pf2, Pf3, Ps3),
+	last(Q, Dernier),
+	print(Dernier),
+	aetoile(Pf3, Pu3, Ps3).
