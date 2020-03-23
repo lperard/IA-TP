@@ -75,7 +75,7 @@ expand(U, G, R):-
 		(rule(A, 1, U, U2), heuristique1(U2, H), F is H + G1),
 		R).
 
-loop_successors([],_,_,_,_,_).
+loop_successors_2([],_,Pu,Pf,Pu,Pf).
 
 
 /*loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
@@ -110,8 +110,7 @@ loop_successors([],_,_,_,_,_).
 
 % La situation est connue dans Q
 node_process([U, [_,_,_], _,_], Q, Pu, Pf, Pu, Pf) :-
-	belongs([U, [_,_,_], _,_], Q),
-	print('Cas 1').
+	belongs([U, [_,_,_], _,_], Q).
 
 % La situation est connue dans Pu, on garde la meilleure
 node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
@@ -121,39 +120,39 @@ node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	suppress([U,[Fu, Hu, Gu], PereU, Au], Pu, Pu_inter),
 	suppress([[Fu, Hu, Gu], U], Pf, Pf_inter),
 	insert([U,[F, H, G]],Pu_inter, Pu2),
-	insert([[F, H, G], U], Pf_inter, Pf2)
-	print('Cas 2').
+	insert([[F, H, G], U], Pf_inter, Pf2).
+
+node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu, Pf) :-
+	belongs([U,[_,_,_], _,_], Pu).
+
 % Dernier cas: c'est une situation nouvelle, on l'insert dans Pu et Pf
 node_process([U, [F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	insert([U, [F, H, G], Pere, A], Pu, Pu2),
-	insert([[F, H, G], U], Pf, Pf2),
-	print('Cas 3').
+	insert([[F, H, G], U], Pf, Pf2).
 
 
 loop_successors_2([Head|Tail], Q, Pu, Pf, Pu_final, Pf_final) :-
 	node_process(Head, Q, Pu, Pf, Pu_inter, Pf_inter),
-	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
+	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final),
+	print('Just processed').
 
 aetoile([],[], _):-
 	print("Pas de solution, l_etat final n_est pas atteignable").
 
 % Si la situation de coût minimal est la situation finale, on s'arrete
 aetoile(Pf, Pu, Qs) :-
-	final_state(Final),
 	suppress_min(Umin, Pf, Pf2_inutile), %a checker
-	Umin = [[Fu, Hu, Gu], U],
-	U = Final,
+	suppress([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Pu,Pu_inutile),
+	final_state(Umin),
+	insert([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Qs, Q_fini),
 	affiche_solution(Umin).
 
 % Sinon on continue d'explorer
 aetoile(Pf, Pu, Qs) :-
-	final_state(Final),
-	suppress_min(Umin, Pf, Pf2_inutile), %a checker
-	Umin = [[Fu, Hu, Gu], U],
-	suppress([[F,H,G],U],Pf,Pf2),
-	suppress([U, [Fu2, Hu2, Gu2], Upere, Au], Pu, Pu2),
-	expand(U,G,R),
-	loop_successors_2(R, Q, Pu2, Pf2, Pf3, Ps3),
+	suppress_min([[Fmin, Hmin, Gmin], Umin], Pf, Pf2), %a checker
+	suppress([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Pu, Pu2),
+	expand(Umin,Gmin,R),
+	loop_successors_2(R, Q, Pu2, Pf2, Pu3, Pf3),
+	insert([Umin, [Fmi, Hmin, Gmin], PereMin, AMin], Qs, Q),
 	last(Q, Dernier),
-	print(Dernier),
-	aetoile(Pf3, Pu3, Ps3).
+	aetoile(Pf3, Pu3, Q).
