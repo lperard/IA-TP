@@ -75,8 +75,6 @@ expand(U, G, R):-
 		(rule(A, 1, U, U2), heuristique1(U2, H), F is H + G1),
 		R).
 
-loop_successors_2([],_,Pu,Pf,Pu,Pf).
-
 
 /*loop_successors([Head|Tail], Q, Pu, Pf, Pu2, Pf2):-
 	Head = [U, [F,H,G], Pere, A],
@@ -130,11 +128,12 @@ node_process([U, [F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	insert([U, [F, H, G], Pere, A], Pu, Pu2),
 	insert([[F, H, G], U], Pf, Pf2).
 
+loop_successors_2([],_,Pu,Pf,Pu,Pf).
 
-loop_successors_2([Head|Tail], Q, Pu, Pf, Pu_final, Pf_final) :-
+loop_successors_2(L, Q, Pu, Pf, Pu_final, Pf_final) :-
+	L = [Head|Tail],
 	node_process(Head, Q, Pu, Pf, Pu_inter, Pf_inter),
-	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final),
-	print('Just processed').
+	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
 
 aetoile([],[], _):-
 	print("Pas de solution, l_etat final n_est pas atteignable").
