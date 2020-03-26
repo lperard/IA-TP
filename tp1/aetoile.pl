@@ -47,20 +47,32 @@
 
 %*******************************************************************************
 
+affiche_chemin(U0,_):-
+	initial_state(U0),
+	nl,write(U0).
+
+affiche_chemin(Ua,Q) :-
+	belongs([Ua,[_,_,_], Ui,_],Q),
+	nl,write(Ua),
+	affiche_chemin(Ui,Q).
+
 affiche_solution([[F,H,G], U]):-
 	print(F),
 	print(H),
 	print(G),
 	print(U).
 
+affiche_solution(Q) :-
+	final_state(Final),
+	affiche_chemin(Final,Q).
 
-main_test:- 
+main_test:-
 	initial_state(Ini),
 	% initialisations Pf, Pu et Q
 	empty(Q),
 	empty(Pf_vide),
 	empty(Pu_vide),
-	heuristique1(Ini, H1),
+	heuristique2(Ini, H1),
 	insert([[H1,H1,0], Ini], Pf_vide, Pf),
 	insert([Ini, [H1,H1,0], nil, nil], Pu_vide, Pu),
 	% lancement de Aetoile
@@ -72,7 +84,7 @@ main_test:-
 expand(U, G, R):-
 	G1 is G+1,
 	findall([U2, [F, H, G1],U, A],
-		(rule(A, 1, U, U2), heuristique1(U2, H), F is H + G1),
+		(rule(A, 1, U, U2), heuristique2(U2, H), F is H + G1),
 		R).
 
 
@@ -113,8 +125,8 @@ node_process([U, [_,_,_], _,_], Q, Pu, Pf, Pu, Pf) :-
 % La situation est connue dans Pu, on garde la meilleure
 node_process([U,[F, H, G], Pere, A], Q, Pu, Pf, Pu2, Pf2) :-
 	belongs([U,[Fu, Hu, Gu], PereU, Au], Pu),
-	F < Fu,
 	%On garde le meilleur: on enlève le moins bon et on insert le meilleur
+	F < Fu,
 	suppress([U,[Fu, Hu, Gu], PereU, Au], Pu, Pu_inter),
 	suppress([[Fu, Hu, Gu], U], Pf, Pf_inter),
 	insert([U,[F, H, G]],Pu_inter, Pu2),
@@ -135,16 +147,17 @@ loop_successors_2(L, Q, Pu, Pf, Pu_final, Pf_final) :-
 	node_process(Head, Q, Pu, Pf, Pu_inter, Pf_inter),
 	loop_successors_2(Tail, Q, Pu_inter, Pf_inter, Pu_final, Pf_final).
 
-aetoile([],[], _):-
+aetoile(nil, _, _):-
 	print("Pas de solution, l_etat final n_est pas atteignable").
 
 % Si la situation de coût minimal est la situation finale, on s'arrete
 aetoile(Pf, Pu, Qs) :-
-	suppress_min(Umin, Pf, Pf2_inutile), %a checker
+	suppress_min([[Fmin, Hmin, Gmin], Umin], Pf, _), %a checker
 	suppress([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Pu,Pu_inutile),
 	final_state(Umin),
 	insert([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Qs, Q_fini),
-	affiche_solution(Umin).
+	affiche_solution(Q_fini).
+	% Faut afficher la solution
 
 % Sinon on continue d'explorer
 aetoile(Pf, Pu, Qs) :-
@@ -153,5 +166,4 @@ aetoile(Pf, Pu, Qs) :-
 	expand(Umin,Gmin,R),
 	loop_successors_2(R, Q, Pu2, Pf2, Pu3, Pf3),
 	insert([Umin, [Fmi, Hmin, Gmin], PereMin, AMin], Qs, Q),
-	last(Q, Dernier),
 	aetoile(Pf3, Pu3, Q).

@@ -24,19 +24,19 @@
 
 % AUTRES EXEMPLES POUR LES TESTS DE  A*
 
-
+/*
 initial_state([ [ a, b, c],        
                 [ g, h, d],
                 [vide,f, e] ]). % h2=2, f*=2
-/*
+
 initial_state([ [b, c, d],
                 [a,vide,g],
                 [f, h, e]  ]). % h2=10 f*=10
-			
+*/			
 initial_state([ [f, g, a],
                 [h,vide,b],
                 [d, c, e]  ]). % h2=16, f*=20
-			
+/*		
 initial_state([ [e, f, g],
                 [d,vide,h],
                 [c, b, a]  ]). % h2=24, f*=30 
@@ -44,7 +44,7 @@ initial_state([ [e, f, g],
 initial_state([ [a, b, c],
                 [g,vide,d],
                 [h, f, e]]). % etat non connexe avec l'etat final (PAS DE SOLUTION)
-*/  
+*/
 
 
    %******************
