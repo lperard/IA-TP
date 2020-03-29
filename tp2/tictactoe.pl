@@ -26,7 +26,7 @@
 	*/
 
 situation_initiale([ [_,_,_],
-                     [_,_,_],
+                     [_,x,_],
                      [_,_,_] ]).
 
 	% Convention (arbitraire) : c'est x qui commence
@@ -167,14 +167,14 @@ successeur(J,Etat,[L,C]) :-
 
 
 heuristique(J,Situation,H) :-		% cas 1
-   H = 10000,				% grand nombre approximant +infini
+   H = 10000,						% grand nombre approximant +infini
    alignement(Alig,Situation),
    alignement_gagnant(Alig, J),!.
 
 
 	
 heuristique(J,Situation,H) :-		% cas 2
-   H = -10000,				% grand nombre approximant -infini
+   H = -10000,						% grand nombre approximant -infini
    alignement(Alig,Situation),
    alignement_perdant(Alig,J),!.	
 
@@ -183,7 +183,7 @@ heuristique(J,Situation,H) :-		% cas 2
 % c-a-d si Situation n'est ni perdante ni gagnante.
 
 
-heuristique(J,Situation,H) :- 	% cas 3
+heuristique(J,Situation,H) :- 																	% cas 3
 	findall(Alignement, (alignement(Alignement, Situation),possible(Alignement, J)), List1),
 	length(List1, N1),
 	adversaire(J,J2),
