@@ -66,13 +66,13 @@ affiche_solution(Q) :-
 	final_state(Final),
 	affiche_chemin(Final,Q).
 
-main_test:-
+main_test(L):-
 	initial_state(Ini),
 	% initialisations Pf, Pu et Q
 	empty(Q),
 	empty(Pf_vide),
 	empty(Pu_vide),
-	heuristique2(Ini, H1),
+	heuristique1(Ini, H1),
 	insert([[H1,H1,0], Ini], Pf_vide, Pf),
 	insert([Ini, [H1,H1,0], nil, nil], Pu_vide, Pu),
 	% lancement de Aetoile
@@ -84,7 +84,7 @@ main_test:-
 expand(U, G, R):-
 	G1 is G+1,
 	findall([U2, [F, H, G1],U, A],
-		(rule(A, 1, U, U2), heuristique2(U2, H), F is H + G1),
+		(rule(A, 1, U, U2), heuristique1(U2, H), F is H + G1),
 		R).
 
 
@@ -156,7 +156,8 @@ aetoile(Pf, Pu, Qs) :-
 	suppress([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Pu,Pu_inutile),
 	final_state(Umin),
 	insert([Umin, [Fmin, Hmin, Gmin], PereMin, AMin], Qs, Q_fini),
-	affiche_solution(Q_fini).
+	height(Q_fini,L),
+	print(L).
 	% Faut afficher la solution
 
 % Sinon on continue d'explorer

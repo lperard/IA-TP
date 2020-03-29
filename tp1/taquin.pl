@@ -32,11 +32,11 @@ initial_state([ [ a, b, c],
 initial_state([ [b, c, d],
                 [a,vide,g],
                 [f, h, e]  ]). % h2=10 f*=10
-*/			
+
 initial_state([ [f, g, a],
                 [h,vide,b],
                 [d, c, e]  ]). % h2=16, f*=20
-/*		
+
 initial_state([ [e, f, g],
                 [d,vide,h],
                 [c, b, a]  ]). % h2=24, f*=30 
@@ -46,21 +46,23 @@ initial_state([ [a, b, c],
                 [h, f, e]]). % etat non connexe avec l'etat final (PAS DE SOLUTION)
 */
 
-
+initial_state([ [a, b, c],
+                [g,vide,d],
+                [h, f, e]]).
    %******************
    % ETAT FINAL DU JEU
    %******************
    % format :  final_state(+State) ou State est une matrice (liste de listes)
-   
+
 final_state([[a, b,  c],
              [h,vide, d],
              [g, f,  e]]).
-
-/*final_state([[1,2,3,4],
+/*
+final_state([[1,2,3,4],
             [5,6,7,8],
             [9,10,11,12],
-            [13,14,15,vide]]).*/
-
+            [13,14,15,vide]]).
+*/
 			 
    %********************
    % AFFICHAGE D'UN ETAT

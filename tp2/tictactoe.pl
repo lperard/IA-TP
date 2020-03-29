@@ -84,8 +84,7 @@ colonne(C,M) :-
 	*/
 		
 diagonale(D, M) :- premiere_diag(1,D,M).
-diagonale(D, M) :- length(M,K),
-    seconde_diag(K,D,M).
+diagonale(D, M) :- seconde_diag(1,D,M).
 
 premiere_diag(_,[],[]).
 premiere_diag(K,[E|D],[Ligne|M]) :-
@@ -93,13 +92,13 @@ premiere_diag(K,[E|D],[Ligne|M]) :-
 	K1 is K+1,
 	premiere_diag(K1,D,M).
 
+
 seconde_diag(_,[],[]).
-seconde_diag(K,[E|D],[Ligne|M]) :-
-    nth1(K,Ligne,E),
-    K1 is K-1,
-    seconde_diag(K1,D,M).
-
-
+seconde_diag(K,[E|D],M) :-
+	append(A,[L],M),
+	nth1(K,L,E),
+	K1 is K+1,
+	seconde_diag(K1,D,A).
 	/***********************************
 	 DEFINITION D'UN ALIGNEMENT POSSIBLE
 	 POUR UN JOUEUR DONNE
